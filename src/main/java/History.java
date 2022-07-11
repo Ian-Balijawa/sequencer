@@ -20,35 +20,4 @@ public class History {
             messages.add(message);
         }
     }
-
-    public static class Message {
-        private final byte[] msg;
-        private final long msgID;
-        private final String sender;
-
-        private final long lastSequence;
-
-        public  Message(long msgID, String sender, byte[] msg, long lastSequence) {
-            this.msg = msg;
-            this.sender = sender;
-            this.msgID = msgID;
-            this.lastSequence = lastSequence;
-        }
-
-        public long getLastSequence() {
-            return lastSequence;
-        }
-
-        public byte[] getMsg() {
-            return msg;
-        }
-
-        public String getSender() {
-            return sender;
-        }
-
-        public long getMsgID() {
-            return msgID;
-        }
-    }
 }

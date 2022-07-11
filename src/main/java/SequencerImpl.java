@@ -52,17 +52,17 @@ public class SequencerImpl implements Sequencer {
         // send -- "sender" supplies the msg to be sent, its identifier,
         // and the sequence number of the last received message
 
-        History.Message message = new History.Message(
+        Message message = new Message(
                 msgID,
                 sender,
                 msg,
-                lastSequenceReceived
+                (lastSequenceReceived + 1)
         );
 
         try {
-            group.send(msg);
+            group.send(Message.toByteStream(message));
             history.addMessage(message);
-        } catch (Group.GroupException e) {
+        } catch (Exception e) {
             throw new RemoteException(e.getMessage());
         }
 
