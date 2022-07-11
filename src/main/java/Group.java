@@ -8,7 +8,7 @@ public class Group implements Runnable {
     private final MulticastSocket multicastSocket;
     private final InetAddress inetAddress;
     private final int PORT = 6789;
-
+    private final int TTL = 1;
     private final MsgHandler handler;
 
     public Group(String host, MsgHandler handler, String senderName) throws GroupException {
@@ -19,6 +19,7 @@ public class Group implements Runnable {
 
         try {
             multicastSocket = new MulticastSocket(PORT);
+            multicastSocket.setTimeToLive(TTL);
             inetAddress = InetAddress.getByName(host);
             multicastSocket.joinGroup(inetAddress);
         } catch (Exception e) {
