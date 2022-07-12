@@ -64,6 +64,7 @@ public class Group implements Runnable {
                 multicastSocket.receive(packet);
                 handler.handle(packet.getLength(), packet.getData());
             } catch (IOException e) {
+                multicastSocket.close();
                 throw new RuntimeException(e);
             }
         }
