@@ -1,8 +1,8 @@
-//package sequencer;
 import java.io.*;
 import java.net.*;
-public class SequencerJoinInfo implements Serializable {
 
+public class SequencerJoinInfo implements Serializable
+{
     public InetAddress addr;
     public long sequence;
 
@@ -11,5 +11,4 @@ public class SequencerJoinInfo implements Serializable {
         this.addr = addr;
         this.sequence = sequence;
     }
-
 }

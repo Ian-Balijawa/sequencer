@@ -1,44 +1,98 @@
 import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.rmi.RemoteException;
+import java.util.HashSet;
+import java.util.Locale;
+import java.util.Set;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
-public class SequencerImpl implements Sequencer  {
-    // statements
-    public SequencerJoinInfo join(String sender)
-            throws RemoteException, SequencerException, UnknownHostException {
+public class SequencerImpl implements Sequencer {
 
-        InetAddress group = InetAddress.getByName("227.8.9.0");
-        SequencerJoinInfo information = new SequencerJoinInfo(group,32423);
-        return information;
-    };
+    private final Group group;
+    private final ExecutorService executorService;
+    private final Set<String> senders;
 
-    // send -- "sender" supplies the msg to be sent, its identifier,
-    // and the sequence number of the last received message
-    public void send(String sender, byte[] msg, long msgID, long lastSequenceReceived)
-            throws RemoteException{
+    private final History history;
 
-    };
+    public SequencerImpl(String host, Group.MsgHandler handler, String senderName) {
+        executorService = Executors.newSingleThreadExecutor();
+        senders = new HashSet<>();
+        history = new History();
 
-    // leave -- tell sequencer that "sender" will no longer need its services
-    public void leave(String sender)
-            throws RemoteException {
+        try {
+            group = new Group(host, handler, senderName);
+            executorService.execute(group);
+        } catch (Group.GroupException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
-    };
+    @Override
+    public SequencerJoinInfo join(String sender) throws RemoteException, SequencerException {
+        // join -- request for "sender" to join sequencer's multicasting service;
+        // returns an object specifying the multicast address and the first sequence number to expect
+        SequencerJoinInfo sequencerJoinInfo = null;
 
-    // getMissing -- ask sequencer for the message whose sequence number is "sequence"
-    public byte[] getMissing(String sender, long sequence)
-            throws RemoteException, SequencerException {
+        try {
+            if (!senders.contains(sender.toLowerCase(Locale.ROOT))) {
+                InetAddress address = group.getInetAddress();
+                sequencerJoinInfo = new SequencerJoinInfo(address, 1);
+                senders.add(sender.toLowerCase(Locale.ROOT));
+            }
+        } catch (Exception e) {
+            throw new SequencerException(e.getMessage());
+        }
 
-        byte [] buffer = new byte[1000];
+
+        return sequencerJoinInfo;
+    }
+
+    @Override
+    public void send(String sender, byte[] msg, long msgID, long lastSequenceReceived) throws RemoteException {
+        // send -- "sender" supplies the msg to be sent, its identifier,
+        // and the sequence number of the last received message
+
+        Message message = new Message(
+                msgID,
+                sender,
+                msg,
+                (lastSequenceReceived + 1)
+        );
+
+        try {
+            group.send(Message.toByteStream(message));
+            history.addMessage(message);
+        } catch (Exception e) {
+            throw new RemoteException(e.getMessage());
+        }
+
+    }
+
+    @Override
+    public void leave(String sender) throws RemoteException {
+        // leave -- tell sequencer that "sender" will no longer need its services
+
+        try {
+            if (senders.contains(sender.toLowerCase(Locale.ROOT))) {
+                group.leave();
+                executorService.shutdownNow();
+                senders.remove(sender.toLowerCase(Locale.ROOT));
+            }
+        } catch (Group.GroupException e) {
+            throw new RemoteException(e.getMessage());
+        }
+    }
+
+    @Override
+    public byte[] getMissing(String sender, long sequence) throws RemoteException, SequencerException {
+        // getMissing -- ask sequencer for the message whose sequence number is "sequence"
+        byte[] buffer = new byte[10000];
+
         return buffer;
+    }
 
-    };
-
-    // heartbeat -- we have received messages up to number "lastSequenceReceived"
-    public void heartbeat(String sender, long lastSequenceReceived)
-            throws RemoteException{
-
-        // heart beat testing.
-
-    };
+    @Override
+    public void heartbeat(String sender, long lastSequenceReceived) throws RemoteException {
+        // heartbeat -- we have received messages up to number "lastSequenceReceived"
+    }
 }
