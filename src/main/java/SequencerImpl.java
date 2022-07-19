@@ -75,7 +75,7 @@ public class SequencerImpl implements Sequencer {
         try {
             if (senders.contains(sender.toLowerCase(Locale.ROOT))) {
                 group.leave();
-                executorService.shutdownNow();
+                executorService.shutdown();
                 senders.remove(sender.toLowerCase(Locale.ROOT));
             }
         } catch (Group.GroupException e) {
