@@ -25,7 +25,7 @@ public class TestSequencer {
 
         //multicast IPAddress
 //        String multicastAddress = "234." + day + "." + month + "." + random_int;
-        String multicastAddress = "230.0.0.0";
+        String multicastAddress = "234.0.0.0";
 
         // Getting input from the user
         String sender = null;
@@ -34,8 +34,18 @@ public class TestSequencer {
         sender = input.nextLine();
         String finalSender = sender;
 
-        GUI.GUIHandler guiHandler = (String message) -> {
-            send(date, message, testsequencer, finalSender);
+        GUI.GUIHandler guiHandler = new GUI.GUIHandler() {
+            @Override
+            public void getTextInput(String message) {
+                send(date, message, testsequencer, finalSender);
+            }
+
+            @Override
+            public void stressTest() {
+                for (int i = 0; i <= 30; i++){
+                    send(date, "message: " + i, testsequencer, finalSender);
+                }
+            }
         };
 
         Group.MsgHandler handler = (count, msg) -> {
@@ -45,7 +55,6 @@ public class TestSequencer {
 //                if (!Objects.equals(messageFrom.getSender(), finalSender)) {
 //                    System.out.println("Message from " + messageFrom.getSender() + ": " + message);
 //                }
-                System.out.println(messageFrom.getLastSequence());
                 gui.queueMessage("Message from " + messageFrom.getSender() + ": " + message);
                 seguences.push(messageFrom.getLastSequence());
 

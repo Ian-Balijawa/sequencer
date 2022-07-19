@@ -87,5 +87,25 @@ public class Group implements Runnable {
 
     public static class HeartBeater extends Thread {
         // This thread sends heartbeat messages when required
+
+        public HeartBeaterHandler handler;
+        public HeartBeater(HeartBeaterHandler handler){
+            this.handler = handler;
+
+        }
+
+        private void worker() {
+            handler.handle();
+        }
+
+        @Override
+        public void run() {
+            super.run();
+            worker();
+        }
+
+        public interface HeartBeaterHandler {
+            void handle();
+        }
     }
 } 

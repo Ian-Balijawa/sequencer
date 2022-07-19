@@ -20,9 +20,12 @@ public class GUI extends JFrame {
         JLabel label = new JLabel("Enter message");
         JTextField tf = new JTextField(10);
         JButton send = new JButton("Send");
+        JButton stressTest = new JButton("Stress test");
+        JScrollPane scrollPane = new JScrollPane();
         panel.add(label);
         panel.add(tf);
         panel.add(send);
+        panel.add(stressTest);
 
         listModel = new DefaultListModel<>();
         JList<String> jList = new JList<>(listModel);
@@ -30,10 +33,18 @@ public class GUI extends JFrame {
             handler.getTextInput(tf.getText());
         });
 
+        scrollPane.setViewportView(jList);
+        jList.setLayoutOrientation(JList.VERTICAL);
+
+        stressTest.addActionListener(actionEvent -> {
+            handler.stressTest();
+        });
+
         //Adding Components to the frame.
         this.getContentPane().add(BorderLayout.SOUTH, panel);
-        this.getContentPane().add(BorderLayout.NORTH, panel);
         this.getContentPane().add(BorderLayout.CENTER, jList);
+        this.getContentPane().add(BorderLayout.WEST, scrollPane);
+        this.setLocationRelativeTo(null);
         this.setVisible(true);
     }
 
@@ -48,5 +59,6 @@ public class GUI extends JFrame {
 
     public interface GUIHandler{
         void getTextInput(String message);
+        void stressTest();
     }
 }
