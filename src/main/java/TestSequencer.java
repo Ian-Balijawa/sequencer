@@ -71,11 +71,14 @@ public class TestSequencer {
             if (message.toLowerCase().trim().equals("exit")) {
                 input.close();
                 testsequencer.leave(sender);
+            }else if(!message.toLowerCase().trim().isEmpty()) {
+                long lastSequence = 0;
+                if (!seguences.empty()) lastSequence = seguences.peek();
+                testsequencer.send(sender, message.trim().getBytes(), Long.parseLong(message_id), lastSequence);
+                seguences.push(lastSequence + 1);
+            }else {
+                send(date, input, testsequencer, sender);
             }
-            long lastSequence = 0;
-            if (!seguences.empty()) lastSequence = seguences.peek();
-            testsequencer.send(sender, message.trim().getBytes(), Long.parseLong(message_id), lastSequence);
-            seguences.push(lastSequence + 1);
         } catch (RemoteException e) {
             input.close();
             throw new RuntimeException(e);

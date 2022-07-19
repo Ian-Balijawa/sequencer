@@ -46,6 +46,7 @@ public class Group implements Runnable {
         // leave group
         try {
             multicastSocket.leaveGroup(inetAddress);
+            multicastSocket.disconnect();
             multicastSocket.close();
         } catch (IOException e) {
             throw new GroupException("Failed to leave group. Error message: " + e.getMessage());
@@ -59,13 +60,17 @@ public class Group implements Runnable {
         // of Group.MsgHandler which was supplied to the constructor
 
         while(true) {
-            DatagramPacket packet = new DatagramPacket(messageBuffer, messageBuffer.length);
-            try {
-                multicastSocket.receive(packet);
-                handler.handle(packet.getLength(), packet.getData());
-            } catch (IOException e) {
-                multicastSocket.close();
-                throw new RuntimeException(e);
+            if(!multicastSocket.isClosed()) {
+                DatagramPacket packet = new DatagramPacket(messageBuffer, messageBuffer.length);
+                try {
+                    multicastSocket.receive(packet);
+                    handler.handle(packet.getLength(), packet.getData());
+                } catch (IOException e) {
+                    multicastSocket.close();
+                    throw new RuntimeException(e);
+                }
+            }else {
+                return;
             }
         }
     }
