@@ -21,7 +21,8 @@ public class Main {
         int day = localDate.getDayOfMonth();
 
         //multicast IPAddress
-        String multicastAddress = "234." + day + "." + month + "." + random_int;
+        //String multicastAddress = "234." + day + "." + month + "." + random_int;
+        String  multicastAddress = "230.0.0.0";
 
         // Getting input from the user
         String sender = null;
