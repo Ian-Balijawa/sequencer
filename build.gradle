@@ -1,12 +1,14 @@
 plugins {
     id 'java'
+    id 'application'
 }
 
 apply plugin: 'java'
+apply plugin: 'application'
 
 version '0.0.1'
-
 sourceCompatibility = 1.8
+mainClassName = 'TestSequencer'
 
 group 'com.example'
 
@@ -21,8 +23,10 @@ dependencies {
 
 jar {
     manifest {
-        attributes 'Main-Class': 'Main'
+        attributes 'Main-Class': mainClassName
     }
+
+    baseName "build_release"
 }
 
 test {

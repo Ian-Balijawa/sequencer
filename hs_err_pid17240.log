@@ -16,6 +16,6 @@
 
 ---------------  S U M M A R Y ------------
 
-Command Line: -agentlib:jdwp=transport=dt_socket,server=n,suspend=y,address=127.0.0.1:42661 -Dfile.encoding=UTF-8 -Duser.country=US -Duser.language=en -Duser.variant Main
+Command Line: -agentlib:jdwp=transport=dt_socket,server=n,suspend=y,address=127.0.0.1:42661 -Dfile.encoding=UTF-8 -Duser.country=US -Duser.language=en -Duser.variant TestSequencer
 
 Host: 
