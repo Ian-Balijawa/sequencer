@@ -2,14 +2,13 @@ import java.rmi.RemoteException;
 import java.time.ZoneId;
 import java.util.*;
 import java.time.LocalDate;
-
 public class TestSequencer {
-
     static Stack<Long> seguences;
     static Sequencer testsequencer;
 
     public static void main(String[] args) {
         seguences = new Stack<>();
+
         int min = 1;
         int max = 254;
         // Random number section
@@ -23,7 +22,7 @@ public class TestSequencer {
         int day = localDate.getDayOfMonth();
 
         //multicast IPAddress
-//        String multicastAddress = "234." + day + "." + month + "." + random_int;
+        //  String multicastAddress = "234." + day + "." + month + "." + random_int;
         String multicastAddress = "230.0.0.0";
 
         // Getting input from the user
@@ -32,15 +31,15 @@ public class TestSequencer {
         System.out.print("Enter your name: ");
         sender = input.nextLine();
 
-
         String finalSender = sender;
+
         Group.MsgHandler handler = (count, msg) -> {
             try {
                 Scanner it = new Scanner(System.in);
                 Message messageFrom = Message.fromByteStream(msg);
                 String message = new String(messageFrom.getMsg());
                 if (!Objects.equals(messageFrom.getSender(), finalSender)) {
-                    System.out.println("Message from " + messageFrom.getSender() + " :" + message);
+                    System.out.println("Message from " + messageFrom.getSender() + " : " + message);
                 }
                 seguences.push(messageFrom.getLastSequence());
                 send(date, it, testsequencer, finalSender);

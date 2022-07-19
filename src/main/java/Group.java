@@ -2,6 +2,8 @@ import java.net.*;
 import java.util.*;
 import java.io.*;
 import java.rmi.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class Group implements Runnable {
 
@@ -10,6 +12,8 @@ public class Group implements Runnable {
     private final int PORT = 6789;
     private final int TTL = 1;
     private final MsgHandler handler;
+
+    private static ExecutorService executor;
 
     public Group(String host, MsgHandler handler, String senderName) throws GroupException {
         // contact Sequencer on "host" to join group,
@@ -86,6 +90,32 @@ public class Group implements Runnable {
     }
 
     public static class HeartBeater extends Thread {
+
+        private HeartBeaterHandler handler;
+//        public HeatBeater(HeartBeaterHandler handler){
+//            this.handler = handler;
+//        }
         // This thread sends heartbeat messages when required
+        Timer t = new Timer();
+        private void stressTest(){
+            t.schedule(
+                    new TimerTask()
+                    {
+                        public void run()
+                        {
+                            System.out.println("hello\n");
+                        }
+                    }, 2000);
+        }
+
+        @Override
+        public void run() {
+            super.run();
+            stressTest();
+        }
+
+        public interface HeartBeaterHandler {
+            void handle();
+        }
     }
 } 
