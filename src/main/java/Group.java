@@ -37,7 +37,7 @@ public class Group implements Runnable {
         try {
             DatagramPacket datagramPacket = new DatagramPacket(msg, msg.length, inetAddress, PORT);
             multicastSocket.send(datagramPacket);
-        }catch(Exception e){
+        } catch (Exception e) {
             throw new GroupException(e.getMessage());
         }
     }
