@@ -55,13 +55,6 @@ public class TestSequencer {
                 Message messageFrom = Message.fromByteStream(msg);
                 String message = new String(messageFrom.getMsg());
 
-                if (!Objects.equals(messageFrom.getSender(), finalSender)) {
-                    System.out.println("Message from " + messageFrom.getSender() + " : " + message);
-                }
-
-//                if (!Objects.equals(messageFrom.getSender(), finalSender)) {
-//                    System.out.println("Message from " + messageFrom.getSender() + ": " + message);
-//                }
                 gui.queueMessage("Message from " + messageFrom.getSender() + ": " + message);
 
                 seguences.push(messageFrom.getLastSequence());
@@ -85,8 +78,6 @@ public class TestSequencer {
             throw new RuntimeException(e);
         }
 
-
-//        send(date, input, testsequencer, sender);
     }
 
     private static void send(Date date, String message, Sequencer testsequencer, String sender) {
@@ -109,26 +100,4 @@ public class TestSequencer {
         }
     }
 
-//    private static void send(Date date, Scanner input, Sequencer testsequencer, String sender) {
-//
-//        try {
-//            String message_id = "15786" + date.getTime();
-//            System.out.print("Enter message: ");
-//            String message = input.nextLine();
-//            if (message.toLowerCase().trim().equals("exit")) {
-//                testsequencer.leave(sender);
-//            }else if(!message.toLowerCase().trim().isEmpty()) {
-//                long lastSequence = 0;
-//                if (!seguences.empty()) lastSequence = seguences.peek();
-//                testsequencer.send(sender, message.trim().getBytes(), Long.parseLong(message_id), lastSequence);
-//                seguences.push(lastSequence + 1);
-//            }else {
-//                send(date, input, testsequencer, sender);
-//            }
-//            input.close();
-//        } catch (RemoteException e) {
-//            input.close();
-//            throw new RuntimeException(e);
-//        }
-//    }
 }
