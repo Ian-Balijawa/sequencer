@@ -91,6 +91,7 @@ public class SequencerImpl implements Sequencer {
         return buffer;
     }
 
+
     @Override
     public void heartbeat(String sender, long lastSequenceReceived) throws RemoteException {
         // heartbeat -- we have received messages up to number "lastSequenceReceived"
