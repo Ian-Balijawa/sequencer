@@ -1,16 +1,16 @@
 import java.io.*;
 
 public class Message implements Serializable {
-    private final byte[] msg;
-    private final long msgID;
+    private final byte[] message;
+    private final long messageID;
     private final String sender;
 
     private final long lastSequence;
 
-    public Message(long msgID, String sender, byte[] msg, long lastSequence) {
-        this.msg = msg;
+    public Message(long msgID, String sender, byte[] message, long lastSequence) {
+        this.message = message;
         this.sender = sender;
-        this.msgID = msgID;
+        this.messageID = msgID;
         this.lastSequence = lastSequence;
     }
 
@@ -19,7 +19,7 @@ public class Message implements Serializable {
     }
 
     public byte[] getMsg() {
-        return msg;
+        return message;
     }
 
     public String getSender() {
@@ -27,7 +27,7 @@ public class Message implements Serializable {
     }
 
     public long getMsgID() {
-        return msgID;
+        return messageID;
     }
 
     public static byte[] toByteStream(Message message) throws Exception {

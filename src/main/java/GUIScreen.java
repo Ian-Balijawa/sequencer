@@ -1,13 +1,11 @@
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
-public class GUI extends JFrame {
-    private final GUIHandler handler;
+public class GUIScreen extends JFrame {
+    private final Handler handler;
     private final DefaultListModel<String> listModel;
 
-    public GUI(GUIHandler handler){
+    public GUIScreen(Handler handler){
         super("Multicast");
         this.handler = handler;
         this.setDefaultCloseOperation(EXIT_ON_CLOSE);
@@ -57,7 +55,7 @@ public class GUI extends JFrame {
         listModel.addElement(message);
     }
 
-    public interface GUIHandler{
+    public interface Handler{
         void getTextInput(String message);
         void stressTest();
     }

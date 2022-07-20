@@ -65,7 +65,7 @@ public class SequencerImpl implements Sequencer {
 
         try {
             group.send(Message.toByteStream(message));
-            history.addMessage(message);
+            history.addMessageToQueue(message);
         } catch (Exception e) {
             throw new RemoteException(e.getMessage());
         }
@@ -91,7 +91,7 @@ public class SequencerImpl implements Sequencer {
     public byte[] getMissing(String sender, long sequence) throws RemoteException, SequencerException {
         // getMissing -- ask sequencer for the message whose sequence number is lost
 
-        Message message = history.findMessage(sequence);
+        Message message = history.findMessageFromQueue(sequence);
 
         if(message == null){
             throw new SequencerException("Message not found");

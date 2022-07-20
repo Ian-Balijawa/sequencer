@@ -1,57 +1,53 @@
 import java.net.*;
-import java.util.*;
 import java.io.*;
-import java.rmi.*;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 public class Group implements Runnable {
 
-    private final MulticastSocket multicastSocket;
+    private final MulticastSocket ms; //multicastSocket
     private final InetAddress inetAddress;
     private final int PORT = 6789;
-    private final int TTL = 1;
-    private final MsgHandler handler;
+    private final int TIME_TO_LIVE = 1;
+    private final MsgHandler msgHandler;
+    private static ExecutorService exec;
+    private static final long SLEEP_TIME = 1000;
 
-    private static ExecutorService executor;
 
-    public Group(String host, MsgHandler handler, String senderName) throws GroupException {
+    public Group(String host, MsgHandler msgHandler, String senderName) throws GroupException {
         // contact Sequencer on "host" to join group,
         // create MulticastSocket and thread to listen on it,
         // perform other initialisations
-        this.handler = handler;
+        this.msgHandler = msgHandler;
 
         try {
-            multicastSocket = new MulticastSocket(PORT);
-            multicastSocket.setTimeToLive(TTL);
+            ms = new MulticastSocket(PORT);
+            ms.setTimeToLive(TIME_TO_LIVE);
             inetAddress = InetAddress.getByName(host);
-            multicastSocket.joinGroup(inetAddress);
+            ms.joinGroup(inetAddress);
         } catch (Exception e) {
             throw new GroupException(e.getMessage());
         }
-
     }
 
     public InetAddress getInetAddress() {
-        return multicastSocket.getInetAddress();
+        return ms.getInetAddress();
     }
 
     public void send(byte[] msg) throws GroupException {
         // send the given message to all instances of Group using the same sequencer
         try {
             DatagramPacket datagramPacket = new DatagramPacket(msg, msg.length, inetAddress, PORT);
-            multicastSocket.send(datagramPacket);
+            ms.send(datagramPacket);
         } catch (Exception e) {
             throw new GroupException(e.getMessage());
         }
     }
 
     public void leave() throws GroupException {
-        // leave group
         try {
-            multicastSocket.leaveGroup(inetAddress);
-            multicastSocket.disconnect();
-            multicastSocket.close();
+            ms.leaveGroup(inetAddress);
+            ms.disconnect();
+            ms.close();
         } catch (IOException e) {
             throw new GroupException("Failed to leave group. Error message: " + e.getMessage());
         }
@@ -59,18 +55,15 @@ public class Group implements Runnable {
 
     public void run() {
         byte[] messageBuffer = new byte[256];
-        // repeatedly: listen to MulticastSocket created in constructor, and on receipt
-        // of a datagram call "handle" on the instance
-        // of Group.MsgHandler which was supplied to the constructor
 
         while(true) {
-            if(!multicastSocket.isClosed()) {
-                DatagramPacket packet = new DatagramPacket(messageBuffer, messageBuffer.length);
+            if(!ms.isClosed()) {
+                DatagramPacket datagramPacket = new DatagramPacket(messageBuffer, messageBuffer.length);
                 try {
-                    multicastSocket.receive(packet);
-                    handler.handle(packet.getLength(), packet.getData());
+                    ms.receive(datagramPacket);
+                    msgHandler.handle(datagramPacket.getLength(), datagramPacket.getData());
                 } catch (IOException e) {
-                    multicastSocket.close();
+                    ms.close();
                     throw new RuntimeException(e);
                 }
             }else {
@@ -101,11 +94,10 @@ public class Group implements Runnable {
             while(true){
                 handler.handle(i);
                 try {
-                    Thread.sleep(60000); // wait for 1 minute
+                    Thread.sleep(SLEEP_TIME); // wait for 1 minute
                 } catch ( Exception e){
                     System.out.println(e.getMessage());
                 }
-
                 i++; // increment the looping variable
 
             }

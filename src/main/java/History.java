@@ -2,28 +2,29 @@ import java.util.*;
 
 public class History {
 
-    private final Queue<Message> messages;
+    private final Queue<Message> messagesQueue;
+    private final int QUEUE_SIZE = 1024;
 
     public History(){
-        messages = new LinkedList<>();
+        messagesQueue = new LinkedList<>();
     }
 
-    public Message[] getMessages() {
-        return messages.toArray(new Message[0]);
+    public Message[] getMessagesFromQueue() {
+        return messagesQueue.toArray(new Message[0]);
     }
 
-    public void addMessage(Message message) {
-        if (messages.size() < 1024) {
-            messages.add(message);
+    public void addMessageToQueue(Message message) {
+        if (messagesQueue.size() < QUEUE_SIZE) {
+            messagesQueue.add(message);
         }else {
-            messages.remove();
-            messages.add(message);
+            messagesQueue.remove();
+            messagesQueue.add(message);
         }
     }
 
-    public Message findMessage(long sequenceNumber){
+    public Message findMessageFromQueue(long sequenceNumber){
 
-        for (Message value: messages){
+        for (Message value: messagesQueue){
             if (value.getLastSequence() == sequenceNumber){
                 return value;
             }
