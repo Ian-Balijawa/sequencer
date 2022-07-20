@@ -91,12 +91,17 @@ public class Group implements Runnable {
 
     public static class HeartBeater extends Thread {
 
+        private final HeartBeaterHandler handler;
+        public HeartBeater(HeartBeaterHandler handler){
+            this.handler = handler;
+        }
+
         int i = 0;
         public void run( ){
             while(true){
-                System.out.println(i);
+                handler.handle(i);
                 try {
-                    Thread.sleep(5000); // wait for 5 seconds
+                    Thread.sleep(60000); // wait for 1 minute
                 } catch ( Exception e){
                     System.out.println(e.getMessage());
                 }
@@ -105,6 +110,10 @@ public class Group implements Runnable {
 
             }
 
+        }
+
+        public  interface HeartBeaterHandler{
+            void handle(int i);
         }
     }
 } 

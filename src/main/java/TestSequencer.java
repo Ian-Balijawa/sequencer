@@ -35,9 +35,6 @@ public class TestSequencer {
         sender = input.nextLine();
         String finalSender = sender;
 
-        Group.HeartBeater heartbeaterHandler = new Group.HeartBeater();
-        heartbeaterHandler.start();
-
         GUI.GUIHandler guiHandler = new GUI.GUIHandler() {
             @Override
             public void getTextInput(String message) {
@@ -75,8 +72,12 @@ public class TestSequencer {
             }
         };
 
+        Group.HeartBeater.HeartBeaterHandler heartBeaterHandler = (int i) -> {
+            send(date, "pinging: " + i, testsequencer, finalSender);
+        };
+
         gui = new GUI(guiHandler);
-        testsequencer = new SequencerImpl(multicastAddress, handler, sender);
+        testsequencer = new SequencerImpl(multicastAddress, handler, heartBeaterHandler, sender);
 
         try {
             testsequencer.join(sender);

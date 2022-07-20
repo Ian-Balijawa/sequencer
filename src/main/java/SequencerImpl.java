@@ -14,14 +14,18 @@ public class SequencerImpl implements Sequencer {
 
     private final History history;
 
-    public SequencerImpl(String host, Group.MsgHandler handler, String senderName) {
+    private final Group.HeartBeater heartBeater;
+
+    public SequencerImpl(String host, Group.MsgHandler handler, Group.HeartBeater.HeartBeaterHandler heartBeaterHandler, String senderName) {
         executorService = Executors.newSingleThreadExecutor();
         senders = new HashSet<>();
         history = new History();
 
         try {
             group = new Group(host, handler, senderName);
+            heartBeater = new Group.HeartBeater(heartBeaterHandler);
             executorService.execute(group);
+            heartBeater.start();
         } catch (Group.GroupException e) {
             throw new RuntimeException(e);
         }
@@ -86,14 +90,24 @@ public class SequencerImpl implements Sequencer {
     @Override
     public byte[] getMissing(String sender, long sequence) throws RemoteException, SequencerException {
         // getMissing -- ask sequencer for the message whose sequence number is lost
-        byte[] buffer = new byte[10000];
 
-        return buffer;
+        Message message = history.findMessage(sequence);
+
+        if(message == null){
+            throw new SequencerException("Message not found");
+        }
+
+        try {
+            return Message.toByteStream(message);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
 
     @Override
     public void heartbeat(String sender, long lastSequenceReceived) throws RemoteException {
         // heartbeat -- we have received messages up to number "lastSequenceReceived"
+
     }
 }

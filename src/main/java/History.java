@@ -20,4 +20,15 @@ public class History {
             messages.add(message);
         }
     }
+
+    public Message findMessage(long sequenceNumber){
+
+        for (Message value: messages){
+            if (value.getLastSequence() == sequenceNumber){
+                return value;
+            }
+        }
+
+        return null;
+    }
 }
