@@ -2,18 +2,17 @@ import java.rmi.RemoteException;
 import java.time.ZoneId;
 import java.util.*;
 import java.time.LocalDate;
-
 public class TestSequencer {
-
     static Stack<Long> seguences;
     static Sequencer testsequencer;
     static  GUI gui;
 
     public static void main(String[] args) {
         seguences = new Stack<>();
+
         int min = 1;
         int max = 254;
-        // Random number section
+        // Random number selection
         int random_int = (int) Math.floor(Math.random() * (max - min + 1) + min);
 
         // Date section
@@ -23,9 +22,11 @@ public class TestSequencer {
         int month = localDate.getMonthValue();
         int day = localDate.getDayOfMonth();
 
-        //multicast IPAddress
-//        String multicastAddress = "234." + day + "." + month + "." + random_int;
-        String multicastAddress = "234.0.0.0";
+        // dynamic multicast IPAddress
+        //  String multicastAddress = "234." + day + "." + month + "." + random_int;
+
+        //static multicast IPAddress
+        String multicastAddress = "234.20.7.1";
 
         // Getting input from the user
         String sender = null;
@@ -33,6 +34,9 @@ public class TestSequencer {
         System.out.print("Enter your name: ");
         sender = input.nextLine();
         String finalSender = sender;
+
+        Group.HeartBeater heartbeaterHandler = new Group.HeartBeater();
+        heartbeaterHandler.start();
 
         GUI.GUIHandler guiHandler = new GUI.GUIHandler() {
             @Override
@@ -48,14 +52,21 @@ public class TestSequencer {
             }
         };
 
+
         Group.MsgHandler handler = (count, msg) -> {
             try {
                 Message messageFrom = Message.fromByteStream(msg);
                 String message = new String(messageFrom.getMsg());
+
+                if (!Objects.equals(messageFrom.getSender(), finalSender)) {
+                    System.out.println("Message from " + messageFrom.getSender() + " : " + message);
+                }
+
 //                if (!Objects.equals(messageFrom.getSender(), finalSender)) {
 //                    System.out.println("Message from " + messageFrom.getSender() + ": " + message);
 //                }
                 gui.queueMessage("Message from " + messageFrom.getSender() + ": " + message);
+
                 seguences.push(messageFrom.getLastSequence());
 
             } catch (Exception e) {
