@@ -5,13 +5,14 @@ import java.time.LocalDate;
 public class TestSequencer {
     static Stack<Long> seguences;
     static Sequencer testsequencer;
+    static  GUI gui;
 
     public static void main(String[] args) {
         seguences = new Stack<>();
 
         int min = 1;
         int max = 254;
-        // Random number section
+        // Random number selection
         int random_int = (int) Math.floor(Math.random() * (max - min + 1) + min);
 
         // Date section
@@ -21,34 +22,60 @@ public class TestSequencer {
         int month = localDate.getMonthValue();
         int day = localDate.getDayOfMonth();
 
-        //multicast IPAddress
+        // dynamic multicast IPAddress
         //  String multicastAddress = "234." + day + "." + month + "." + random_int;
-        String multicastAddress = "230.0.0.0";
+
+        //static multicast IPAddress
+        String multicastAddress = "234.20.7.1";
 
         // Getting input from the user
         String sender = null;
         Scanner input = new Scanner(System.in);
         System.out.print("Enter your name: ");
         sender = input.nextLine();
-
         String finalSender = sender;
+
+        Group.HeartBeater heartbeaterHandler = new Group.HeartBeater();
+        heartbeaterHandler.start();
+
+        GUI.GUIHandler guiHandler = new GUI.GUIHandler() {
+            @Override
+            public void getTextInput(String message) {
+                send(date, message, testsequencer, finalSender);
+            }
+
+            @Override
+            public void stressTest() {
+                for (int i = 0; i <= 30; i++){
+                    send(date, "message: " + i, testsequencer, finalSender);
+                }
+            }
+        };
+
 
         Group.MsgHandler handler = (count, msg) -> {
             try {
-                Scanner it = new Scanner(System.in);
                 Message messageFrom = Message.fromByteStream(msg);
                 String message = new String(messageFrom.getMsg());
+
                 if (!Objects.equals(messageFrom.getSender(), finalSender)) {
                     System.out.println("Message from " + messageFrom.getSender() + " : " + message);
                 }
+
+//                if (!Objects.equals(messageFrom.getSender(), finalSender)) {
+//                    System.out.println("Message from " + messageFrom.getSender() + ": " + message);
+//                }
+                gui.queueMessage("Message from " + messageFrom.getSender() + ": " + message);
+
                 seguences.push(messageFrom.getLastSequence());
-                send(date, it, testsequencer, finalSender);
+
             } catch (Exception e) {
                 System.out.println(e.getMessage());
                 throw new RuntimeException(e);
             }
         };
 
+        gui = new GUI(guiHandler);
         testsequencer = new SequencerImpl(multicastAddress, handler, sender);
 
         try {
@@ -58,29 +85,49 @@ public class TestSequencer {
         }
 
 
-        send(date, input, testsequencer, sender);
+//        send(date, input, testsequencer, sender);
     }
 
-    private static void send(Date date, Scanner input, Sequencer testsequencer, String sender) {
+    private static void send(Date date, String message, Sequencer testsequencer, String sender) {
 
         try {
             String message_id = "15786" + date.getTime();
-            System.out.print("Enter message: ");
-            String message = input.nextLine();
             if (message.toLowerCase().trim().equals("exit")) {
-                input.close();
+                if(gui != null) {
+                    gui.close();
+                }
                 testsequencer.leave(sender);
             }else if(!message.toLowerCase().trim().isEmpty()) {
                 long lastSequence = 0;
                 if (!seguences.empty()) lastSequence = seguences.peek();
                 testsequencer.send(sender, message.trim().getBytes(), Long.parseLong(message_id), lastSequence);
                 seguences.push(lastSequence + 1);
-            }else {
-                send(date, input, testsequencer, sender);
             }
         } catch (RemoteException e) {
-            input.close();
             throw new RuntimeException(e);
         }
     }
+
+//    private static void send(Date date, Scanner input, Sequencer testsequencer, String sender) {
+//
+//        try {
+//            String message_id = "15786" + date.getTime();
+//            System.out.print("Enter message: ");
+//            String message = input.nextLine();
+//            if (message.toLowerCase().trim().equals("exit")) {
+//                testsequencer.leave(sender);
+//            }else if(!message.toLowerCase().trim().isEmpty()) {
+//                long lastSequence = 0;
+//                if (!seguences.empty()) lastSequence = seguences.peek();
+//                testsequencer.send(sender, message.trim().getBytes(), Long.parseLong(message_id), lastSequence);
+//                seguences.push(lastSequence + 1);
+//            }else {
+//                send(date, input, testsequencer, sender);
+//            }
+//            input.close();
+//        } catch (RemoteException e) {
+//            input.close();
+//            throw new RuntimeException(e);
+//        }
+//    }
 }

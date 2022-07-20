@@ -85,7 +85,7 @@ public class SequencerImpl implements Sequencer {
 
     @Override
     public byte[] getMissing(String sender, long sequence) throws RemoteException, SequencerException {
-        // getMissing -- ask sequencer for the message whose sequence number is "sequence"
+        // getMissing -- ask sequencer for the message whose sequence number is lost
         byte[] buffer = new byte[10000];
 
         return buffer;

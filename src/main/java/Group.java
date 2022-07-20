@@ -91,31 +91,20 @@ public class Group implements Runnable {
 
     public static class HeartBeater extends Thread {
 
-        private HeartBeaterHandler handler;
-//        public HeatBeater(HeartBeaterHandler handler){
-//            this.handler = handler;
-//        }
-        // This thread sends heartbeat messages when required
-        Timer t = new Timer();
-        private void stressTest(){
-            t.schedule(
-                    new TimerTask()
-                    {
-                        public void run()
-                        {
-                            System.out.println("hello\n");
-                        }
-                    }, 2000);
-        }
+        int i = 0;
+        public void run( ){
+            while(true){
+                System.out.println(i);
+                try {
+                    Thread.sleep(5000); // wait for 5 seconds
+                } catch ( Exception e){
+                    System.out.println(e.getMessage());
+                }
 
-        @Override
-        public void run() {
-            super.run();
-            stressTest();
-        }
+                i++; // increment the looping variable
 
-        public interface HeartBeaterHandler {
-            void handle();
+            }
+
         }
     }
 } 
