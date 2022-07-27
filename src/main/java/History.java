@@ -13,6 +13,10 @@ public class History {
         return messagesQueue.toArray(new Message[0]);
     }
 
+    public Queue<Message> getMessagesQueue() {
+        return this.messagesQueue;
+    }
+    
     public void addMessageToQueue(Message message) {
         if (messagesQueue.size() < QUEUE_SIZE) {
             messagesQueue.add(message);

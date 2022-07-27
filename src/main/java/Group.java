@@ -8,12 +8,12 @@ public class Group implements Runnable {
     private final InetAddress inetAddress;
     private final int PORT = 6789;
     private final int TIME_TO_LIVE = 1;
-    private final MsgHandler msgHandler;
+    private final MessageHandler msgHandler;
     private static ExecutorService exec;
-    private static final long SLEEP_TIME = 1000;
+    private static final long SLEEP_TIME = 3000;
 
 
-    public Group(String host, MsgHandler msgHandler, String senderName) throws GroupException {
+    public Group(String host, MessageHandler msgHandler, String senderName) throws GroupException {
         // contact Sequencer on "host" to join group,
         // create MulticastSocket and thread to listen on it,
         // perform other initialisations
@@ -72,7 +72,7 @@ public class Group implements Runnable {
         }
     }
 
-    public interface MsgHandler {
+    public interface MessageHandler {
         public void handle(int count, byte[] msg);
     }
 
@@ -89,23 +89,22 @@ public class Group implements Runnable {
             this.handler = handler;
         }
 
-        int i = 0;
+        int counter = 0;
         public void run( ){
             while(true){
-                handler.handle(i);
+                handler.handle(counter);
                 try {
-                    Thread.sleep(SLEEP_TIME); // wait for 1 minute
+                    Thread.sleep(SLEEP_TIME);
                 } catch ( Exception e){
                     System.out.println(e.getMessage());
                 }
-                i++; // increment the looping variable
-
+                counter++;
             }
 
         }
 
         public  interface HeartBeaterHandler{
-            void handle(int i);
+            void handle(int counter);
         }
     }
 } 

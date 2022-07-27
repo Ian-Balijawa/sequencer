@@ -2,6 +2,7 @@ import java.net.InetAddress;
 import java.rmi.RemoteException;
 import java.util.HashSet;
 import java.util.Locale;
+import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -16,11 +17,12 @@ public class SequencerImpl implements Sequencer {
 
     private final Group.HeartBeater heartBeater;
 
-    public SequencerImpl(String host, Group.MsgHandler handler, Group.HeartBeater.HeartBeaterHandler heartBeaterHandler, String senderName) {
+    public SequencerImpl(String host, Group.MessageHandler handler, Group.HeartBeater.HeartBeaterHandler heartBeaterHandler, String senderName) {
         executorService = Executors.newSingleThreadExecutor();
         senders = new HashSet<>();
         history = new History();
 
+        
         try {
             group = new Group(host, handler, senderName);
             heartBeater = new Group.HeartBeater(heartBeaterHandler);
@@ -31,6 +33,10 @@ public class SequencerImpl implements Sequencer {
         }
     }
 
+    public Message[] getMessagesFromQueue() {
+        return this.history.getMessagesFromQueue();
+    }
+    
     @Override
     public SequencerJoinInfo join(String sender) throws RemoteException, SequencerException {
         // join -- request for "sender" to join sequencer's multicasting service;
@@ -69,7 +75,6 @@ public class SequencerImpl implements Sequencer {
         } catch (Exception e) {
             throw new RemoteException(e.getMessage());
         }
-
     }
 
     @Override

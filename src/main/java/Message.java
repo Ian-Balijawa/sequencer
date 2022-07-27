@@ -4,7 +4,6 @@ public class Message implements Serializable {
     private final byte[] message;
     private final long messageID;
     private final String sender;
-
     private final long lastSequence;
 
     public Message(long msgID, String sender, byte[] message, long lastSequence) {
@@ -33,10 +32,10 @@ public class Message implements Serializable {
     public static byte[] toByteStream(Message message) throws Exception {
         byte[] data;
 
-        try (ByteArrayOutputStream bas = new ByteArrayOutputStream();
-             ObjectOutputStream oos = new ObjectOutputStream(bas)) {
-            oos.writeObject(message);
-            data = bas.toByteArray();
+        try (ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+            ObjectOutputStream outputStream = new ObjectOutputStream(byteArrayOutputStream)) {
+            outputStream.writeObject(message);
+            data = byteArrayOutputStream.toByteArray();
         }
         return data;
     }
@@ -44,11 +43,22 @@ public class Message implements Serializable {
     public static Message fromByteStream(byte[] data) throws Exception {
         Message message;
 
-        try (ByteArrayInputStream bis = new ByteArrayInputStream(data);
-             ObjectInputStream ois = new ObjectInputStream(bis)) {
-            message = (Message) ois.readObject();
+        try (ByteArrayInputStream byteInputStream = new ByteArrayInputStream(data);
+            ObjectInputStream objectInputStream = new ObjectInputStream(byteInputStream)) {
+            message = (Message) objectInputStream.readObject();
         }
 
         return message;
+    }
+
+    @Override
+    public String toString() {
+        String msg = null;
+
+        for(int i = 0; i < this.message.length;i++ ){
+            msg += this.message[i];
+        }
+
+        return "Message: "+ msg + " ID: "+this.messageID+" "+" sender: "+this.sender+" "+"LastSequence: "+ this.lastSequence;
     }
 }

@@ -3,10 +3,12 @@ import java.util.*;
 
 public class TestSequencer {
     static Stack<Long> seguenceStack; //stack of sequences
-    static Sequencer testsequencer;
+    static SequencerImpl testsequencer;
     static  GUIScreen guiScreen;
+    private static final int STRESS_LIMIT = 1000;
 
     public static void main(String[] args) {
+        // To easily get the most recent messages from the sequence. constant Time complexity for popining an element from the stack
         seguenceStack = new Stack<>();
 
         Date date = new Date();
@@ -17,7 +19,7 @@ public class TestSequencer {
         // Getting input from the user
         String sender = null;
         try (Scanner input = new Scanner(System.in)) {
-            System.out.print("Enter your name: ");
+            System.out.print("Enter username: ");
             sender = input.nextLine();
         }
         String finalSender = sender;
@@ -30,19 +32,34 @@ public class TestSequencer {
 
             @Override
             public void stressTest() {
-                for (int i = 0; i <= 30; i++){
+                for (int i = 0; i <= STRESS_LIMIT; i++) {
                     send(date, "Message: " + i, testsequencer, finalSender);
+                }
+
+                for(int i = 0; i <= STRESS_LIMIT;i++){
+                    System.out.println("STRESSING: " + date+ "Message: " + i + " " + finalSender);
+                }
+            }
+
+            @Override
+            public void viewHistory() {
+                System.out.println("Hello");
+                for(int i = 0; i < testsequencer.getMessagesFromQueue().length;i++){
+
+                    System.out.println(testsequencer.getMessagesFromQueue()[i].toString());
                 }
             }
         };
 
-        Group.MsgHandler handler = (count, msg) -> {
+        guiScreen = new GUIScreen(guiHandler);
+
+        Group.MessageHandler handler = (count, msg) -> {
             try {
+
                 Message messageFrom = Message.fromByteStream(msg);
                 String message = new String(messageFrom.getMsg());
 
-                guiScreen.queueMessage("Message from " + messageFrom.getSender() + ": " + message);
-
+                guiScreen.queueMessage("Message sent from: " + messageFrom.getSender() + " : " + message);
                 seguenceStack.push(messageFrom.getLastSequence());
 
             } catch (Exception e) {
@@ -52,18 +69,16 @@ public class TestSequencer {
         };
 
         Group.HeartBeater.HeartBeaterHandler heartBeaterHandler = (int i) -> {
-            send(date, "pinging: " + i, testsequencer, finalSender);
+            send(date, "Sending heart-beat: " + i, testsequencer, finalSender);
         };
 
-        guiScreen = new GUIScreen(guiHandler);
-        testsequencer = new SequencerImpl(multicastAddress, handler, heartBeaterHandler, sender);
 
+        testsequencer = new SequencerImpl(multicastAddress, handler,heartBeaterHandler, sender);
         try {
             testsequencer.join(sender);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-
     }
 
     private static void send(Date date, String message, Sequencer testsequencer, String sender) {
