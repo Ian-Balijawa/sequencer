@@ -43,7 +43,6 @@ public class TestSequencer {
 
             @Override
             public void viewHistory() {
-                System.out.println("Hello");
                 for(int i = 0; i < testsequencer.getMessagesFromQueue().length;i++){
 
                     System.out.println(testsequencer.getMessagesFromQueue()[i].toString());

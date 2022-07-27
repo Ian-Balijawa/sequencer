@@ -1,4 +1,5 @@
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 
 public class Message implements Serializable {
     private final byte[] message;
@@ -53,12 +54,9 @@ public class Message implements Serializable {
 
     @Override
     public String toString() {
-        String msg = null;
+        String msg = new String(this.message,StandardCharsets.UTF_8);
 
-        for(int i = 0; i < this.message.length;i++ ){
-            msg += this.message[i];
-        }
-
-        return "Message: "+ msg + " ID: "+this.messageID+" "+" sender: "+this.sender+" "+"LastSequence: "+ this.lastSequence;
+        // return "Message: "+ msg + "\n ID: "+this.messageID + "\n sender: "+ this.sender +"\n LastSequence: "+ this.lastSequence;
+        return "Message: "+ msg + " ID: "+this.messageID + " sender: "+ this.sender +" LastSequence: "+ this.lastSequence;
     }
 }
