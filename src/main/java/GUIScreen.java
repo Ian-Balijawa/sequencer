@@ -20,7 +20,7 @@ public class GUIScreen extends JFrame {
         JButton send = new JButton("Send");
         JButton stressTest = new JButton("Stress test");
         JButton clear = new JButton("CLEAR");
-        JButton viewHistory = new JButton("View History");
+        JButton viewHistory = new JButton("View History On Console");
 
         JScrollPane scrollPane = new JScrollPane();
         panel.add(label);
